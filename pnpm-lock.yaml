@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@pentops/jsonapi-jdef-ts-generator':
-    specifier: ^0.0.48
-    version: 0.0.48(@pentops/jsonapi-request@0.0.3)
+    specifier: ^0.0.49
+    version: 0.0.49(@pentops/jsonapi-request@0.0.4)
   change-case:
     specifier: ^5.4.4
     version: 5.4.4
@@ -682,22 +682,22 @@ packages:
       '@jridgewell/sourcemap-codec': 1.5.0
     dev: true
 
-  /@pentops/jsonapi-jdef-ts-generator@0.0.48(@pentops/jsonapi-request@0.0.3):
-    resolution: {integrity: sha512-WCUaBpCDXn0RIfnz2ymjTqmQtarJX64/P3oXBYl9Z09BlmXpDJUw2o5ybvXnWBCyEhtwyt2ci89ord97tkaLsw==}
+  /@pentops/jsonapi-jdef-ts-generator@0.0.49(@pentops/jsonapi-request@0.0.4):
+    resolution: {integrity: sha512-SvbTYwZCJYUuVVIwkbgCLgsGhWzi0kmLCXCbFsAgQl1sRtDIFw75QSbf+DGadzb63uQn9JITdu9rwvhvDuiBDQ==}
     hasBin: true
     peerDependencies:
-      '@pentops/jsonapi-request': ^0.0.3
+      '@pentops/jsonapi-request': ^0.0.4
     dependencies:
-      '@pentops/jsonapi-request': 0.0.3
+      '@pentops/jsonapi-request': 0.0.4
       change-case: 5.4.4
       find-up: 7.0.0
       typescript: 5.5.4
     dev: false
 
-  /@pentops/jsonapi-request@0.0.3:
-    resolution: {integrity: sha512-q3brbIsDDnviQsAJSEBKoYjFwSkyvOW4bPN4mua26gSP+sgKwvq/4MdE9XhHrNn+Epij+tmkOQSIzmS8wvCGMg==}
+  /@pentops/jsonapi-request@0.0.4:
+    resolution: {integrity: sha512-UOb0H2KakG3mmdxToUTeg2bfvNA+ll0z9lHCRrrgezYI6FFRdfvVWTDl29HbZmdIFTNY3DsW7Zx5J6GM6Lx/GQ==}
     peerDependencies:
-      uuid: ^9.0.1
+      uuid: ^10.0.0
     peerDependenciesMeta:
       uuid:
         optional: true
