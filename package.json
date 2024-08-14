@@ -20,23 +20,23 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/jest": "^29.5.12",
     "@types/lodash.set": "^4.3.9",
-    "@types/node": "^22.2.0",
+    "@types/node": "^22.3.0",
+    "i18next": "^23.12.3",
     "jest": "^29.7.0",
     "prettier": "^3.3.3",
-    "i18next": "^23.12.3",
     "rollup": "^4.20.0",
     "ts-jest": "^29.2.4",
     "tslib": "^2.6.3",
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.46",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.48",
     "change-case": "^5.4.4",
     "lodash.set": "^4.3.2",
     "ts-pattern": "^5.3.1"
   },
   "peerDependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.46",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.48",
     "i18next": "^23.12.3"
   }
 }

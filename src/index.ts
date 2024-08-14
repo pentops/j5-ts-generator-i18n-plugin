@@ -6,7 +6,6 @@ import {
   type PluginConfig,
   type PluginFileGeneratorConfig,
   type GeneratedClientFunction,
-  createExportDeclaration,
 } from '@pentops/jsonapi-jdef-ts-generator';
 import { camelCase } from 'change-case';
 import set from 'lodash.set';
@@ -300,7 +299,8 @@ export class I18nPlugin extends PluginBase<I18nPluginFileGeneratorConfig, I18nPl
       [I18nPlugin.createObjectLiteral({ ...remainingInitOptions, resources: resourcesObjectLiteral })],
     );
 
-    indexFile.addNodes(callExpression, factory.createIdentifier('\n'), createExportDeclaration([I18NEXT_DEFAULT_EXPORT_NAME]));
+    indexFile.addNodes(callExpression, factory.createIdentifier('\n'));
+    indexFile.addManualExport(undefined, { namedExports: [I18NEXT_DEFAULT_EXPORT_NAME], typeOnlyExports: [] })
   }
 
   public async run() {
