@@ -5,7 +5,7 @@ import {
   PluginBase,
   type PluginConfig,
   type PluginFileGeneratorConfig,
-  type GeneratedClientFunction,
+  type GeneratedClientFunction, createObjectLiteral,
 } from '@pentops/jsonapi-jdef-ts-generator';
 import { camelCase } from 'change-case';
 import set from 'lodash.set';
@@ -146,18 +146,6 @@ export class I18nPlugin extends PluginBase<I18nPluginFileGeneratorConfig, I18nPl
     return translations;
   }
 
-  private static createObjectLiteral(obj: any): ts.ObjectLiteralExpression {
-    const properties: ts.ObjectLiteralElementLike[] = [];
-
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        properties.push(factory.createPropertyAssignment(factory.createIdentifier(key), I18nPlugin.createExpression(obj[key])));
-      }
-    }
-
-    return factory.createObjectLiteralExpression(properties, true);
-  }
-
   private static buildResourcesObjectLiteral(providedResources: Resource, generatedResources: Record<string, Record<string, string>>) {
     const mergedResources: Record<string, Record<string, string | object>> = {};
     const allLanguages = Array.from(new Set(Object.keys(providedResources).concat(Object.keys(generatedResources))));
@@ -183,52 +171,7 @@ export class I18nPlugin extends PluginBase<I18nPluginFileGeneratorConfig, I18nPl
       }
     }
 
-    return I18nPlugin.createObjectLiteral(mergedResources);
-  }
-
-  private static createExpression(value: any): ts.Expression {
-    if (typeof value === 'string') {
-      return factory.createStringLiteral(value, true);
-    }
-
-    if (typeof value === 'number') {
-      if (value.toString().charAt(0) === '-') {
-        return factory.createPrefixUnaryExpression(ts.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value)));
-      }
-
-      return factory.createNumericLiteral(value);
-    }
-
-    if (typeof value === 'boolean') {
-      return value ? factory.createTrue() : factory.createFalse();
-    }
-
-    if (Array.isArray(value)) {
-      const elements = value.map((item) => I18nPlugin.createExpression(item));
-      return factory.createArrayLiteralExpression(elements, true);
-    }
-
-    if (value === null) {
-      return factory.createNull();
-    }
-
-    if (typeof value === 'object') {
-      if (ts.isIdentifier(value)) {
-        return value;
-      }
-
-      if (ts.isObjectLiteralExpression(value)) {
-        return value;
-      }
-
-      return I18nPlugin.createObjectLiteral(value);
-    }
-
-    if (typeof value === 'undefined') {
-      return factory.createIdentifier('undefined');
-    }
-
-    throw new Error(`Unsupported value type: ${typeof value}`);
+    return createObjectLiteral(mergedResources);
   }
 
   private static getFileNamespace(file: I18nPluginFileGeneratorConfig) {
@@ -296,7 +239,7 @@ export class I18nPlugin extends PluginBase<I18nPluginFileGeneratorConfig, I18nPl
         factory.createIdentifier(I18NEXT_INIT_FUNCTION_NAME),
       ),
       undefined,
-      [I18nPlugin.createObjectLiteral({ ...remainingInitOptions, resources: resourcesObjectLiteral })],
+      [createObjectLiteral({ ...remainingInitOptions, resources: resourcesObjectLiteral })],
     );
 
     indexFile.addNodes(callExpression, factory.createIdentifier('\n'));
