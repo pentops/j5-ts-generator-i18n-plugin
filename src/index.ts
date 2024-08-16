@@ -97,6 +97,7 @@ export interface I18nIndexFileConfig extends PluginFileGeneratorConfig {
   addGeneratedResources?: boolean;
   initOptions?: InitOptions;
   middleware?: I18nIndexMiddlewareConfig[];
+  topOfFileComment?: string;
 }
 
 export interface I18nPluginConfig extends PluginConfig<I18nPluginFileGeneratorConfig> {
@@ -243,7 +244,8 @@ export class I18nPlugin extends PluginBase<I18nPluginFileGeneratorConfig, I18nPl
     );
 
     indexFile.addNodes(callExpression, factory.createIdentifier('\n'));
-    indexFile.addManualExport(undefined, { namedExports: [I18NEXT_DEFAULT_EXPORT_NAME], typeOnlyExports: [] })
+    indexFile.addManualExport(undefined, { namedExports: [I18NEXT_DEFAULT_EXPORT_NAME], typeOnlyExports: [] });
+    indexFile.generateHeading();
   }
 
   public async run() {
