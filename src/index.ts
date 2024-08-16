@@ -1,11 +1,12 @@
-import type { Resource, ResourceLanguage, InitOptions } from 'i18next';
+import type { InitOptions, Resource, ResourceLanguage } from 'i18next';
 import { match, P } from 'ts-pattern';
 import {
+  createObjectLiteral,
+  type GeneratedClientFunction,
   type GeneratedSchema,
   PluginBase,
   type PluginConfig,
   type PluginFileGeneratorConfig,
-  type GeneratedClientFunction, createObjectLiteral,
 } from '@pentops/jsonapi-jdef-ts-generator';
 import { camelCase } from 'change-case';
 import set from 'lodash.set';
@@ -179,6 +180,63 @@ export class I18nPlugin extends PluginBase<I18nPluginFileGeneratorConfig, I18nPl
     return file.namespaceName || camelCase(file.fileName.replace('.json', ''));
   }
 
+  public async run() {
+    for (const file of this.files) {
+      const fileData = I18nPlugin.parseExistingValue(file.existingFileContent);
+      const existingTranslationsInFile = I18nPlugin.gatherTranslations(fileData);
+      const generatedTranslations: Map<string, Translation> = new Map();
+
+      for (const [, schema] of this.generatedSchemas) {
+        if (file.isFileForSchema(schema)) {
+          const translationPath =
+            typeof file.config.translationPathOrGetter === 'function'
+              ? file.config.translationPathOrGetter(schema)
+              : file.config.translationPathOrGetter || defaultTranslationPathOrGetter(schema);
+
+          if (translationPath) {
+            const translationsForSchema = file.config.translationWriter
+              ? file.config.translationWriter(schema, translationPath, existingTranslationsInFile)
+              : defaultSchemaTranslationWriter(schema, translationPath, existingTranslationsInFile);
+
+            for (const translation of translationsForSchema || []) {
+              generatedTranslations.set(translation.key, translation);
+            }
+          }
+        }
+      }
+
+      for (const [key, value] of existingTranslationsInFile) {
+        if (!generatedTranslations.has(key)) {
+          const unmatchedTranslationHandler = file.config.unmatchedTranslationFromExistingFileHandler;
+
+          if (typeof unmatchedTranslationHandler === 'function') {
+            const newValue = unmatchedTranslationHandler(value);
+
+            if (newValue) {
+              generatedTranslations.set(key, newValue);
+            }
+          } else if (unmatchedTranslationHandler !== 'remove') {
+            generatedTranslations.set(key, value);
+          }
+        }
+      }
+
+      const fileContent: ResourceLanguage = {};
+
+      for (const translation of generatedTranslations.values()) {
+        if (translation.value !== null && translation.value !== undefined) {
+          set(fileContent, translation.key, translation.value);
+        }
+      }
+
+      file.setRawContent(JSON.stringify(fileContent, null, 2));
+    }
+
+    if (this.pluginConfig.indexFile) {
+      this.generateIndexFile();
+    }
+  }
+
   private generateIndexFile() {
     if (!this.pluginConfig.indexFile) {
       return;
@@ -246,62 +304,5 @@ export class I18nPlugin extends PluginBase<I18nPluginFileGeneratorConfig, I18nPl
     indexFile.addNodes(callExpression, factory.createIdentifier('\n'));
     indexFile.addManualExport(undefined, { namedExports: [I18NEXT_DEFAULT_EXPORT_NAME], typeOnlyExports: [] });
     indexFile.generateHeading();
-  }
-
-  public async run() {
-    for (const file of this.files) {
-      const fileData = I18nPlugin.parseExistingValue(file.existingFileContent);
-      const existingTranslationsInFile = I18nPlugin.gatherTranslations(fileData);
-      const generatedTranslations: Map<string, Translation> = new Map();
-
-      for (const [, schema] of this.generatedSchemas) {
-        if (file.isFileForSchema(schema)) {
-          const translationPath =
-            typeof file.config.translationPathOrGetter === 'function'
-              ? file.config.translationPathOrGetter(schema)
-              : file.config.translationPathOrGetter || defaultTranslationPathOrGetter(schema);
-
-          if (translationPath) {
-            const translationsForSchema = file.config.translationWriter
-              ? file.config.translationWriter(schema, translationPath, existingTranslationsInFile)
-              : defaultSchemaTranslationWriter(schema, translationPath, existingTranslationsInFile);
-
-            for (const translation of translationsForSchema || []) {
-              generatedTranslations.set(translation.key, translation);
-            }
-          }
-        }
-      }
-
-      for (const [key, value] of existingTranslationsInFile) {
-        if (!generatedTranslations.has(key)) {
-          const unmatchedTranslationHandler = file.config.unmatchedTranslationFromExistingFileHandler;
-
-          if (typeof unmatchedTranslationHandler === 'function') {
-            const newValue = unmatchedTranslationHandler(value);
-
-            if (newValue) {
-              generatedTranslations.set(key, newValue);
-            }
-          } else if (unmatchedTranslationHandler !== 'remove') {
-            generatedTranslations.set(key, value);
-          }
-        }
-      }
-
-      const fileContent: ResourceLanguage = {};
-
-      for (const translation of generatedTranslations.values()) {
-        if (translation.value !== null && translation.value !== undefined) {
-          set(fileContent, translation.key, translation.value);
-        }
-      }
-
-      file.setRawContent(JSON.stringify(fileContent, null, 2));
-    }
-
-    if (this.pluginConfig.indexFile) {
-      this.generateIndexFile();
-    }
   }
 }
