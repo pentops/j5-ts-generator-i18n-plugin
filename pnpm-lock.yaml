@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@pentops/jsonapi-jdef-ts-generator':
-    specifier: ^0.0.54
-    version: 0.0.54(@pentops/jsonapi-request@0.0.4)
+    specifier: ^0.0.59
+    version: 0.0.59(@pentops/jsonapi-request@0.0.4)
   change-case:
     specifier: ^5.4.4
     version: 5.4.4
@@ -38,8 +38,8 @@ devDependencies:
     specifier: ^22.3.0
     version: 22.3.0
   i18next:
-    specifier: ^23.12.7
-    version: 23.12.7
+    specifier: ^23.13.0
+    version: 23.13.0
   jest:
     specifier: ^29.7.0
     version: 29.7.0(@types/node@22.3.0)
@@ -682,11 +682,11 @@ packages:
       '@jridgewell/sourcemap-codec': 1.5.0
     dev: true
 
-  /@pentops/jsonapi-jdef-ts-generator@0.0.54(@pentops/jsonapi-request@0.0.4):
-    resolution: {integrity: sha512-65DRgT5qRSQgzvGytR3gl7oJg6TRwBMePVxzU/Xi5VInNEjz4vJlHPRIjPLhLLvmQ7bpdceOXMehaSW9Q4RiwQ==}
+  /@pentops/jsonapi-jdef-ts-generator@0.0.59(@pentops/jsonapi-request@0.0.4):
+    resolution: {integrity: sha512-o+D3dp7iXFnmUckpFpKCBrRui38FKI1efmCWZJOi2gUStL1alIs8c7gZFa1jbSscnFpxFJ7kx0DCGD0aOeerGw==}
     hasBin: true
     peerDependencies:
-      '@pentops/jsonapi-request': ^0.0.4
+      '@pentops/jsonapi-request': '>=0.0.4'
     dependencies:
       '@pentops/jsonapi-request': 0.0.4
       change-case: 5.4.4
@@ -1680,8 +1680,8 @@ packages:
     engines: {node: '>=10.17.0'}
     dev: true
 
-  /i18next@23.12.7:
-    resolution: {integrity: sha512-LW7WpZV929NiNfifCPW3JRruEngBviTgaGSviRaXGxxhloCpECNHL8T6axfxGqgGntffiuJwxCWBmTz9hHcfAg==}
+  /i18next@23.13.0:
+    resolution: {integrity: sha512-B+g0/KTKmN3+NeMKPljQxdrih6Q6lyDF5O2e/Ofd0JQsTLojJD/BSTTN04iw6OVc0yBiHeypu5hoBNV6ag44Zw==}
     dependencies:
       '@babel/runtime': 7.25.0
     dev: true
