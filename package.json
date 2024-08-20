@@ -30,13 +30,13 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.62",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.63",
     "change-case": "^5.4.4",
     "lodash.set": "^4.3.2",
     "ts-pattern": "^5.3.1"
   },
   "peerDependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": ">=0.0.52 < 0.1.0",
+    "@pentops/jsonapi-jdef-ts-generator": ">=0.0.63 < 0.1.0",
     "i18next": ">=23.0.0 < 24.0.0"
   }
 }
