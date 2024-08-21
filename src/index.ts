@@ -33,7 +33,7 @@ export type I18nPluginTranslationWriter = (
   existingValues?: Map<string, Translation>,
 ) => Translation[] | undefined;
 
-export interface I18nPluginFileGeneratorConfig extends PluginFileGeneratorConfig {
+export interface I18nPluginFileGeneratorConfig<TFileContentType = string> extends PluginFileGeneratorConfig<TFileContentType> {
   language: string;
   namespaceName?: string;
   translationPathOrGetter?: string | I18nPluginTranslationPathGetter;
@@ -41,10 +41,10 @@ export interface I18nPluginFileGeneratorConfig extends PluginFileGeneratorConfig
   unmatchedTranslationFromExistingFileHandler?: 'keep' | 'remove' | ((translation: Translation) => Translation | null);
 }
 
-export type I18nPluginFileConfigCreator = (
+export type I18nPluginFileConfigCreator<TFileContentType = string> = (
   generatedSchemas: Map<string, GeneratedSchema>,
   generatedClientFunctions: GeneratedClientFunction[],
-) => I18nPluginFileGeneratorConfig[];
+) => I18nPluginFileGeneratorConfig<TFileContentType>[];
 
 export const defaultTranslationPathOrGetter: I18nPluginTranslationPathGetter = (schema: GeneratedSchema): string | undefined =>
   match(schema)
@@ -94,19 +94,19 @@ export interface I18nIndexMiddlewareConfig {
   isDefault?: boolean;
 }
 
-export interface I18nIndexFileConfig extends PluginFileGeneratorConfig {
+export interface I18nIndexFileConfig<TFileContentType = string> extends PluginFileGeneratorConfig<TFileContentType> {
   addGeneratedResources?: boolean;
   initOptions?: InitOptions;
   middleware?: I18nIndexMiddlewareConfig[];
   topOfFileComment?: string;
 }
 
-export interface I18nPluginConfig extends PluginConfig<I18nPluginFileGeneratorConfig> {
-  files: I18nPluginFileGeneratorConfig[] | I18nPluginFileConfigCreator;
+export interface I18nPluginConfig<TFileContentType = string> extends PluginConfig<TFileContentType, I18nPluginFileGeneratorConfig<TFileContentType>> {
+  files: I18nPluginFileGeneratorConfig<TFileContentType>[] | I18nPluginFileConfigCreator<TFileContentType>;
   indexFile?: I18nIndexFileConfig;
 }
 
-export class I18nPlugin extends PluginBase<I18nPluginFileGeneratorConfig, I18nPluginConfig> {
+export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig, I18nPluginConfig> {
   name = 'I18nPlugin';
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
