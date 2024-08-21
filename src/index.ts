@@ -1,3 +1,4 @@
+import ts, { factory } from 'typescript';
 import type { InitOptions, Resource, ResourceLanguage } from 'i18next';
 import { match, P } from 'ts-pattern';
 import {
@@ -10,7 +11,6 @@ import {
 } from '@pentops/jsonapi-jdef-ts-generator';
 import { camelCase } from 'change-case';
 import set from 'lodash.set';
-import ts, { factory } from 'typescript';
 
 export const I18NEXT_IMPORT_PATH = 'i18next';
 export const I18NEXT_DEFAULT_EXPORT_NAME = 'i18n';
