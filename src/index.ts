@@ -244,7 +244,7 @@ export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig
 
     const { addGeneratedResources, initOptions, middleware, ...defaultFileConfig } = this.pluginConfig.indexFile;
 
-    const indexFile = this.createPluginFile(defaultFileConfig);
+    const indexFile = this.createPluginFile(defaultFileConfig, this.pluginConfig.defaultExistingFileReader);
 
     indexFile.addManualImport(I18NEXT_IMPORT_PATH, [], [], I18NEXT_DEFAULT_EXPORT_NAME);
 
