@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@pentops/jsonapi-jdef-ts-generator':
-    specifier: ^0.0.72
-    version: 0.0.72(@pentops/jsonapi-request@0.0.4)
+    specifier: ^0.0.73
+    version: 0.0.73(@pentops/jsonapi-request@0.0.4)
   '@pentops/sort-helpers':
     specifier: ^0.0.1
     version: 0.0.1
@@ -685,8 +685,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.5.0
     dev: true
 
-  /@pentops/jsonapi-jdef-ts-generator@0.0.72(@pentops/jsonapi-request@0.0.4):
-    resolution: {integrity: sha512-mrlojqrVEX9gViz+I49Kokj0HJlz7JwFRDgrvEFjlAK1yEb9pYxWjGfqN/rzrEYo7ImLuuwiKOzKcAwafUpwyQ==}
+  /@pentops/jsonapi-jdef-ts-generator@0.0.73(@pentops/jsonapi-request@0.0.4):
+    resolution: {integrity: sha512-B2Ya/rDyBHUoFdwN1z9S+44dUDl7cLIMkZIUo+rZ92UkGBDHumMQ9Nf2JQfdlZC/Tzcb2m0cQCyjggqZ1P4/uA==}
     hasBin: true
     peerDependencies:
       '@pentops/jsonapi-request': '>=0.0.4'
