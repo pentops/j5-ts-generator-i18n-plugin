@@ -2,7 +2,8 @@ import ts, { factory } from 'typescript';
 import type { InitOptions, Resource, ResourceLanguage } from 'i18next';
 import { match, P } from 'ts-pattern';
 import {
-  createObjectLiteral, defaultPluginFileReader,
+  createObjectLiteral,
+  defaultPluginFileReader,
   type GeneratedClientFunction,
   type GeneratedSchema,
   PluginBase,
@@ -34,7 +35,7 @@ export type I18nPluginTranslationWriter = (
   existingValues?: Map<string, Translation>,
 ) => Translation[] | undefined;
 
-export interface I18nPluginFileGeneratorConfig<TFileContentType = string> extends PluginFileGeneratorConfig<TFileContentType> {
+export interface I18nPluginFileGeneratorConfig<TFileContentType = string> extends Omit<PluginFileGeneratorConfig<TFileContentType>, 'exportFromIndexFile'> {
   language: string;
   namespaceName?: string;
   translationPathOrGetter?: string | I18nPluginTranslationPathGetter;
@@ -110,9 +111,8 @@ export interface I18nPluginConfig<TFileContentType = string> extends PluginConfi
 export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig, I18nPluginConfig> {
   name = 'I18nPlugin';
 
-  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-  constructor(config: I18nPluginConfig) {
-    super(config);
+  protected createPluginFilesFromConfig(fileConfig?: I18nPluginFileGeneratorConfig[]) {
+    super.createPluginFilesFromConfig((fileConfig || []).map((config) => ({ ...config, exportFromIndexFile: false })));
   }
 
   private static parseExistingValue(value: string | undefined): ResourceLanguage | undefined {
@@ -247,7 +247,10 @@ export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig
 
     const { addGeneratedResources, initOptions, middleware, ...defaultFileConfig } = this.pluginConfig.indexFile;
 
-    const indexFile = this.createPluginFile(defaultFileConfig, defaultPluginFileReader, this.pluginConfig.defaultFileHooks);
+    const indexFile = this.createPluginFile({
+      ...defaultFileConfig,
+      exportFromIndexFile: false,
+    }, defaultPluginFileReader, this.pluginConfig.defaultFileHooks);
 
     indexFile.addManualImport(I18NEXT_IMPORT_PATH, [], [], I18NEXT_DEFAULT_EXPORT_NAME);
 
