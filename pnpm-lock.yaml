@@ -8,6 +8,9 @@ dependencies:
   '@pentops/jsonapi-jdef-ts-generator':
     specifier: ^0.0.69
     version: 0.0.69(@pentops/jsonapi-request@0.0.4)
+  '@pentops/sort-helpers':
+    specifier: ^0.0.1
+    version: 0.0.1
   change-case:
     specifier: ^5.4.4
     version: 5.4.4
@@ -703,6 +706,10 @@ packages:
         optional: true
     dependencies:
       qs: 6.13.0
+    dev: false
+
+  /@pentops/sort-helpers@0.0.1:
+    resolution: {integrity: sha512-Hn2eLyvD9wB0maMqnmjDL53gdz93R6NtUnM2C06+3MKH58LD6IKVWjbSsgDsNfHbiTZLGWLL/x/cP9zVcAqN7Q==}
     dev: false
 
   /@pkgjs/parseargs@0.11.0:

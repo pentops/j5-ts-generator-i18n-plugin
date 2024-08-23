@@ -11,6 +11,7 @@ import {
 } from '@pentops/jsonapi-jdef-ts-generator';
 import { camelCase } from 'change-case';
 import set from 'lodash.set';
+import { sortByKey } from '@pentops/sort-helpers';
 
 export const I18NEXT_IMPORT_PATH = 'i18next';
 export const I18NEXT_DEFAULT_EXPORT_NAME = 'i18n';
@@ -223,7 +224,9 @@ export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig
 
       const fileContent: ResourceLanguage = {};
 
-      for (const translation of generatedTranslations.values()) {
+      const translationsSortedByKeyName = sortByKey(Array.from(generatedTranslations.values()), entry => entry.key);
+
+      for (const translation of translationsSortedByKeyName) {
         if (translation.value !== null && translation.value !== undefined) {
           set(fileContent, translation.key, translation.value);
         }

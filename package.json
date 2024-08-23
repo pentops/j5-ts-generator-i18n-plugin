@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@pentops/jsonapi-jdef-ts-generator": "^0.0.69",
+    "@pentops/sort-helpers": "^0.0.1",
     "change-case": "^5.4.4",
     "lodash.set": "^4.3.2",
     "ts-pattern": "^5.3.1"
