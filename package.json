@@ -26,11 +26,11 @@
     "prettier": "^3.3.3",
     "rollup": "^4.21.0",
     "ts-jest": "^29.2.5",
-    "tslib": "^2.6.3",
+    "tslib": "^2.7.0",
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.71",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.72",
     "@pentops/sort-helpers": "^0.0.1",
     "change-case": "^5.4.4",
     "lodash.set": "^4.3.2",
