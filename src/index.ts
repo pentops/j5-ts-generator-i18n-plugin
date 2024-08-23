@@ -2,7 +2,7 @@ import ts, { factory } from 'typescript';
 import type { InitOptions, Resource, ResourceLanguage } from 'i18next';
 import { match, P } from 'ts-pattern';
 import {
-  createObjectLiteral,
+  createObjectLiteral, defaultPluginFileReader,
   type GeneratedClientFunction,
   type GeneratedSchema,
   PluginBase,
@@ -182,7 +182,7 @@ export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig
 
   public async run() {
     for (const file of this.files) {
-      const fileData = I18nPlugin.parseExistingValue(file.existingFileContent);
+      const fileData = I18nPlugin.parseExistingValue(await file.existingFileContent);
       const existingTranslationsInFile = I18nPlugin.gatherTranslations(fileData);
       const generatedTranslations: Map<string, Translation> = new Map();
 
@@ -244,7 +244,7 @@ export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig
 
     const { addGeneratedResources, initOptions, middleware, ...defaultFileConfig } = this.pluginConfig.indexFile;
 
-    const indexFile = this.createPluginFile(defaultFileConfig, this.pluginConfig.defaultExistingFileReader);
+    const indexFile = this.createPluginFile(defaultFileConfig, defaultPluginFileReader, this.pluginConfig.defaultFileHooks);
 
     indexFile.addManualImport(I18NEXT_IMPORT_PATH, [], [], I18NEXT_DEFAULT_EXPORT_NAME);
 

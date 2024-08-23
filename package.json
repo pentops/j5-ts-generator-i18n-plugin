@@ -25,12 +25,12 @@
     "jest": "^29.7.0",
     "prettier": "^3.3.3",
     "rollup": "^4.21.0",
-    "ts-jest": "^29.2.4",
+    "ts-jest": "^29.2.5",
     "tslib": "^2.6.3",
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.66",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.69",
     "change-case": "^5.4.4",
     "lodash.set": "^4.3.2",
     "ts-pattern": "^5.3.1"
