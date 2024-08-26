@@ -11,6 +11,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "jest"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "keywords": [],
   "author": "Joshua Slate",
   "license": "MIT",
