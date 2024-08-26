@@ -183,7 +183,12 @@ export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig
 
   public async run() {
     for (const file of this.files) {
-      const fileData = I18nPlugin.parseExistingValue(await file.getExistingFileContent());
+      let fileData: ResourceLanguage | undefined;
+
+      try {
+        fileData = I18nPlugin.parseExistingValue(await file.getExistingFileContent());
+      } catch {}
+
       const existingTranslationsInFile = I18nPlugin.gatherTranslations(fileData);
       const generatedTranslations: Map<string, Translation> = new Map();
 
