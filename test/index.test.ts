@@ -1,14 +1,9 @@
-import { I18nPlugin, I18nPluginFileGeneratorConfig, I18nPluginTranslationWriter, Translation } from '../src';
+import { I18nPlugin, I18nPluginFileGeneratorConfig } from '../src/plugin';
 import { capitalCase, kebabCase } from 'change-case';
-import {
-  parseApiSource,
-  Generator,
-  GeneratedSchema,
-  PackageSummary,
-  APISource, defaultConfig,
-} from '@pentops/jsonapi-jdef-ts-generator';
+import { parseApiSource, Generator, GeneratedSchema, PackageSummary, APISource, defaultConfig } from '@pentops/jsonapi-jdef-ts-generator';
 import { match, P } from 'ts-pattern';
 import mockApiSource from './helpers/mock-api.json';
+import { I18nPluginTranslationWriter, Translation } from '../src';
 
 export const defaultMinorWords = [
   'and',
@@ -126,7 +121,7 @@ describe(I18nPlugin, () => {
         function getValidSchemaPackage(schema: GeneratedSchema) {
           return match(schema)
             .with(
-              P.union({ rawSchema: { enum: { isDerivedHelperType: P.union(false, undefined) } } }, { rawSchema: { oneOf: P.not(P.nullish) } }),
+              P.union({ rawSchema: { enum: { derivedHelperType: undefined } } }, { rawSchema: { oneOf: P.not(P.nullish) } }),
               (s) => s.parentPackage,
             )
             .otherwise(() => undefined);
