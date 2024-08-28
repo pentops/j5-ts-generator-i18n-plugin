@@ -24,11 +24,11 @@ import {
   I18NEXT_IMPORT_PATH,
   I18NEXT_INIT_FUNCTION_NAME,
   I18NEXT_USE_FUNCTION_NAME,
-  I18nPluginConflictHandler,
-  I18nPluginTranslationPathGetter,
-  I18nPluginTranslationWriter,
-  NamespaceWriter,
-  Translation,
+  type I18nPluginConflictHandler,
+  type I18nPluginTranslationPathGetter,
+  type I18nPluginTranslationWriter,
+  type NamespaceWriter,
+  type Translation,
 } from './helpers';
 
 export interface I18nPluginFileGeneratorConfig<TFileContentType = string>
