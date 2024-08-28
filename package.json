@@ -40,7 +40,7 @@
     "ts-pattern": "^5.3.1"
   },
   "peerDependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": ">=0.0.73 < 0.1.0",
+    "@pentops/jsonapi-jdef-ts-generator": ">=0.0.83 < 0.1.0",
     "i18next": ">=23.0.0 < 24.0.0"
   }
 }
