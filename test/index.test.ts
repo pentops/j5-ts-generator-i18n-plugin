@@ -158,7 +158,5 @@ describe(I18nPlugin, () => {
       dryRun: true,
       plugins: [p],
     }).generate(parseApiSource(mockApiSource as unknown as APISource));
-
-    console.log(p.postRun());
   });
 });

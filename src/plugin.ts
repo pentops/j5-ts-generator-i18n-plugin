@@ -7,9 +7,10 @@ import {
   type GeneratedClientFunction,
   type GeneratedSchema,
   Optional,
-  PluginBase,
+  BasePlugin,
   type PluginConfig,
   type PluginFileGeneratorConfig,
+  BasePluginFile,
 } from '@pentops/jsonapi-jdef-ts-generator';
 import { camelCase } from 'change-case';
 import set from 'lodash.set';
@@ -25,6 +26,7 @@ import {
   I18NEXT_INIT_FUNCTION_NAME,
   I18NEXT_USE_FUNCTION_NAME,
   type I18nPluginConflictHandler,
+  I18nPluginFile,
   type I18nPluginTranslationPathGetter,
   type I18nPluginTranslationWriter,
   type NamespaceWriter,
@@ -67,7 +69,7 @@ export interface I18nPluginConfig<TFileContentType = string> extends PluginConfi
 
 export type I18nPluginConfigInput = Optional<I18nPluginConfig, 'conflictHandler' | 'namespaceWriter'>;
 
-export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig, I18nPluginConfig> {
+export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig, I18nPluginConfig, I18nPluginFile> {
   name = 'I18nPlugin';
 
   private static buildConfig(config: I18nPluginConfigInput): I18nPluginConfig {
@@ -217,7 +219,7 @@ export class I18nPlugin extends PluginBase<string, I18nPluginFileGeneratorConfig
 
     const { addGeneratedResources, initOptions, middleware, ...defaultFileConfig } = this.pluginConfig.indexFile;
 
-    const indexFile = this.createPluginFile(
+    const indexFile = this.createPluginFile<string, I18nIndexFileConfig, I18nPluginConfig, any>(
       {
         ...defaultFileConfig,
         exportFromIndexFile: false,

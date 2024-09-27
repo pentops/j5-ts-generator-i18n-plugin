@@ -1,4 +1,4 @@
-import { PluginFile, type GeneratedSchema } from '@pentops/jsonapi-jdef-ts-generator';
+import { BasePluginFile, type GeneratedSchema } from '@pentops/jsonapi-jdef-ts-generator';
 import { match, P } from 'ts-pattern';
 import { I18nPluginFileGeneratorConfig } from './plugin';
 import { camelCase } from 'change-case';
@@ -7,6 +7,8 @@ export const I18NEXT_IMPORT_PATH = 'i18next';
 export const I18NEXT_DEFAULT_EXPORT_NAME = 'i18n';
 export const I18NEXT_INIT_FUNCTION_NAME = 'init';
 export const I18NEXT_USE_FUNCTION_NAME = 'use';
+
+export type I18nPluginFile = BasePluginFile<string, I18nPluginFileGeneratorConfig>;
 
 export interface Translation {
   // JSON dot notation
@@ -37,7 +39,7 @@ export function buildProspectiveTranslations(
   return prospects;
 }
 
-export type NamespaceWriter = (file: PluginFile<string, I18nPluginFileGeneratorConfig>) => string;
+export type NamespaceWriter = (file: I18nPluginFile) => string;
 
 export const defaultNamespaceWriter: NamespaceWriter = (file) => camelCase(file.config.fileName.replace('.json', ''));
 
