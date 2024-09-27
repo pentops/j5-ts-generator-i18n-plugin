@@ -1,14 +1,14 @@
-import { BasePluginFile, type GeneratedSchema } from '@pentops/jsonapi-jdef-ts-generator';
+import { createObjectLiteral, type GeneratedSchema } from '@pentops/jsonapi-jdef-ts-generator';
 import { match, P } from 'ts-pattern';
-import { I18nPluginFileGeneratorConfig } from './plugin';
 import { camelCase } from 'change-case';
+import { I18nPluginFile } from './plugin-file';
+import type { Resource, ResourceLanguage } from 'i18next';
+import { factory } from 'typescript';
 
 export const I18NEXT_IMPORT_PATH = 'i18next';
 export const I18NEXT_DEFAULT_EXPORT_NAME = 'i18n';
 export const I18NEXT_INIT_FUNCTION_NAME = 'init';
 export const I18NEXT_USE_FUNCTION_NAME = 'use';
-
-export type I18nPluginFile = BasePluginFile<string, I18nPluginFileGeneratorConfig>;
 
 export interface Translation {
   // JSON dot notation
@@ -90,3 +90,65 @@ export const defaultConflictHandler: I18nPluginConflictHandler = (prospect) => {
     .with({ n: P.nullish, e: P.not(P.nullish) }, ({ e }) => ({ key: prospect.key, value: e }))
     .otherwise(() => null);
 };
+
+export function parseExistingValue(value: string | undefined): ResourceLanguage | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    throw new Error(`I18nPlugin: failed to parse existing value: ${value}. ${e}`);
+  }
+}
+
+export function gatherTranslations(fileData: ResourceLanguage | undefined) {
+  const translations = new Map<string, Translation>();
+
+  if (!fileData) {
+    return translations;
+  }
+
+  const gather = (data: string | Record<string, any>, path: string = '') => {
+    if (typeof data === 'object') {
+      for (const [key, value] of Object.entries(data)) {
+        gather(value, path ? `${path}.${key}` : key);
+      }
+    } else {
+      translations.set(path, { key: path, value: data });
+    }
+  };
+
+  gather(fileData);
+
+  return translations;
+}
+
+export function buildResourcesObjectLiteral(providedResources: Resource, generatedResources: Record<string, Record<string, string>>) {
+  const mergedResources: Record<string, Record<string, string | object>> = {};
+  const allLanguages = Array.from(new Set(Object.keys(providedResources).concat(Object.keys(generatedResources))));
+
+  for (const language of allLanguages) {
+    const provided = providedResources[language] || {};
+    const generated = generatedResources[language] || {};
+    const allNamespaces = Array.from(new Set(Object.keys(provided).concat(Object.keys(generated))));
+
+    if (!mergedResources[language]) {
+      mergedResources[language] = {};
+    }
+
+    for (const namespace of allNamespaces) {
+      const value = match({ provided: provided[namespace], generated: generated[namespace] })
+        .with({ generated: P.not(undefined) }, ({ generated: g }) => factory.createIdentifier(g))
+        .with({ provided: P.not(undefined) }, ({ provided: p }) => p)
+        .otherwise(() => undefined);
+
+      if (value) {
+        mergedResources[language][namespace] = value;
+      }
+    }
+  }
+
+  return createObjectLiteral(mergedResources);
+}
