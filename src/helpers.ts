@@ -1,9 +1,9 @@
+import { factory } from 'typescript';
 import { createObjectLiteral, type GeneratedSchema } from '@pentops/jsonapi-jdef-ts-generator';
 import { match, P } from 'ts-pattern';
 import { camelCase } from 'change-case';
-import { I18nPluginFile } from './plugin-file';
 import type { Resource, ResourceLanguage } from 'i18next';
-import { factory } from 'typescript';
+import { I18nPluginFile } from './plugin-file';
 
 export const I18NEXT_IMPORT_PATH = 'i18next';
 export const I18NEXT_DEFAULT_EXPORT_NAME = 'i18n';

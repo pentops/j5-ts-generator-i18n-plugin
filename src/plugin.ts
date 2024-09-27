@@ -4,11 +4,13 @@ import {
   createObjectLiteral,
   type GeneratedClientFunction,
   type GeneratedSchema,
-  Optional,
+  type Optional,
   BasePlugin,
   type IPluginConfig,
   type IPluginFileConfig,
-  IPluginRunOutput,
+  type IPluginRunOutput,
+  defaultGeneratorFileReader,
+  type IWritableFile,
 } from '@pentops/jsonapi-jdef-ts-generator';
 import { camelCase } from 'change-case';
 import set from 'lodash.set';
@@ -32,7 +34,6 @@ import {
   parseExistingValue,
   type Translation,
 } from './helpers';
-import { defaultGeneratorFileReader, IWritableFile } from '@pentops/jsonapi-jdef-ts-generator/dist/file/types';
 import { I18nPluginFile } from './plugin-file';
 
 export interface I18nPluginFileGeneratorConfig<TFileContentType = string> extends Omit<IPluginFileConfig<TFileContentType>, 'exportFromIndexFile'> {
