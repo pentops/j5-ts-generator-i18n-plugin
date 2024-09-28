@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@pentops/jsonapi-jdef-ts-generator':
-        specifier: ^0.0.101
-        version: 0.0.101(@pentops/jsonapi-request@0.0.6(qs@6.13.0)(uuid@10.0.0))
+        specifier: ^0.0.102
+        version: 0.0.102(@pentops/jsonapi-request@0.0.6(qs@6.13.0)(uuid@10.0.0))
       '@pentops/sort-helpers':
         specifier: ^0.0.1
         version: 0.0.1
@@ -347,8 +347,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@pentops/jsonapi-jdef-ts-generator@0.0.101':
-    resolution: {integrity: sha512-IBt/EsSZFAzEUQmlUr4NifueHu716+qJMBrTN2UpwuDiSlgqj4V/Mm5PyeDJtIMpAydX/rIwFxDbPRemgPfwgw==}
+  '@pentops/jsonapi-jdef-ts-generator@0.0.102':
+    resolution: {integrity: sha512-OHd+eLM+UWlA2yNP9etcELZCjITWh1JbzSRmqx156zpDC5JD7OqW5tqxTBEfLwvNGe3iLRvlBuLjW12jK8kHbw==}
     hasBin: true
     peerDependencies:
       '@pentops/jsonapi-request': '>=0.0.4'
@@ -2027,7 +2027,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@pentops/jsonapi-jdef-ts-generator@0.0.101(@pentops/jsonapi-request@0.0.6(qs@6.13.0)(uuid@10.0.0))':
+  '@pentops/jsonapi-jdef-ts-generator@0.0.102(@pentops/jsonapi-request@0.0.6(qs@6.13.0)(uuid@10.0.0))':
     dependencies:
       '@pentops/jsonapi-request': 0.0.6(qs@6.13.0)(uuid@10.0.0)
       change-case: 5.4.4
