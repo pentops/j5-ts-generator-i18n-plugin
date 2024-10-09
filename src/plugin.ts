@@ -35,6 +35,7 @@ import {
   type Translation,
 } from './helpers';
 import { I18nPluginFile } from './plugin-file';
+import { buildState, I18nPluginState } from './state';
 
 export interface I18nPluginFileGeneratorConfig<TFileContentType = string> extends Omit<IPluginFileConfig<TFileContentType>, 'exportFromIndexFile'> {
   language: string;
@@ -71,8 +72,9 @@ export interface I18nPluginConfig extends IPluginConfig<I18nPluginFile> {
 
 export type I18nPluginConfigInput = Optional<I18nPluginConfig, 'conflictHandler' | 'namespaceWriter'>;
 
-export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig, I18nPluginFile, I18nPluginConfig> {
+export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig, I18nPluginFile, I18nPluginConfig, I18nPluginState> {
   name = 'I18nPlugin';
+  private writtenTranslations: Record<string, Translation> = {};
 
   private static buildConfig(config: I18nPluginConfigInput): I18nPluginConfig {
     return {
@@ -114,6 +116,7 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
               : defaultSchemaTranslationWriter(schema, translationPath);
 
             for (const translation of translationsForSchema || []) {
+              translation.source = schema;
               newTranslations.set(translation.key, translation);
             }
           }
@@ -126,7 +129,7 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
 
       for (const [key, value] of prospects) {
         if (value.newValue !== undefined && value.existingValue !== undefined && value.newValue === value.existingValue) {
-          finalTranslationsForFile.set(key, { key, value: value.newValue });
+          finalTranslationsForFile.set(key, { key, value: value.newValue, source: value.source });
         } else if (value.newValue !== undefined || value.existingValue !== undefined) {
           const finalValue = this.pluginConfig.conflictHandler(value, prospects);
 
@@ -142,6 +145,7 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
 
       for (const translation of translationsSortedByKeyName) {
         set(fileContent, translation.key, translation.value);
+        this.writtenTranslations[translation.key] = translation;
       }
 
       file.setRawContent(JSON.stringify(fileContent, null, 2));
@@ -231,5 +235,9 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
     indexFile.addNodes(callExpression, factory.createIdentifier('\n'));
     indexFile.addManualExport(undefined, { namedExports: [I18NEXT_DEFAULT_EXPORT_NAME], typeOnlyExports: [] });
     indexFile.generateHeading();
+  }
+
+  getState(): I18nPluginState | undefined {
+    return buildState(this.writtenTranslations);
   }
 }

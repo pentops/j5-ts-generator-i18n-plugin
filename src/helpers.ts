@@ -14,12 +14,14 @@ export interface Translation {
   // JSON dot notation
   key: string;
   value: string;
+  source?: GeneratedSchema;
 }
 
 export interface ProspectiveTranslation {
   key: string;
   newValue: string | undefined;
   existingValue: string | undefined;
+  source?: GeneratedSchema;
 }
 
 export function buildProspectiveTranslations(
@@ -33,7 +35,12 @@ export function buildProspectiveTranslations(
     const newValue = newValues.get(key);
     const existingValue = existingValues.get(key);
 
-    prospects.set(key, { key, newValue: newValue?.value, existingValue: existingValue?.value });
+    prospects.set(key, {
+      key,
+      newValue: newValue?.value,
+      existingValue: existingValue?.value,
+      source: newValue?.source || existingValue?.source,
+    });
   }
 
   return prospects;
