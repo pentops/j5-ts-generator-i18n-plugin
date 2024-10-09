@@ -23,17 +23,17 @@
     "@rollup/plugin-typescript": "^12.1.0",
     "@types/jest": "^29.5.13",
     "@types/lodash.set": "^4.3.9",
-    "@types/node": "^22.7.4",
-    "i18next": "^23.15.1",
+    "@types/node": "^22.7.5",
+    "i18next": "^23.15.2",
     "jest": "^29.7.0",
     "prettier": "^3.3.3",
-    "rollup": "^4.22.5",
+    "rollup": "^4.24.0",
     "ts-jest": "^29.2.5",
     "tslib": "^2.7.0",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.102",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.105",
     "@pentops/sort-helpers": "^0.0.1",
     "change-case": "^5.4.4",
     "lodash.set": "^4.3.2",
