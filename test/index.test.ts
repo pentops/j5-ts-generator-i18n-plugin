@@ -1,9 +1,31 @@
-import { I18nPlugin, I18nPluginFileGeneratorConfig } from '../src/plugin';
-import { capitalCase, kebabCase } from 'change-case';
-import { parseApiSource, Generator, GeneratedSchema, PackageSummary, APISource, defaultConfig } from '@pentops/jsonapi-jdef-ts-generator';
+import { describe, it, expect } from 'vitest';
 import { match, P } from 'ts-pattern';
-import mockApiSource from './helpers/mock-api.json';
+import { camelCase, capitalCase, kebabCase, pascalCase } from 'change-case';
+import { parseApiSource, GeneratedSchema, PackageSummary, APISource, defaultConfig, ParsedMethod, Builder } from '@pentops/jsonapi-jdef-ts-generator';
+import { I18nPlugin, I18nPluginFileGeneratorConfig } from '../src/plugin';
 import { I18nPluginTranslationWriter, Translation } from '../src';
+import mockApiSource from './helpers/mock-api.json';
+
+function typeNameWriter(x: string) {
+  return x
+    .split(/[./]/)
+    .filter((x) => x)
+    .map((x) => pascalCase(x))
+    .join('');
+}
+
+function methodNameWriter(method: ParsedMethod) {
+  return method.fullGrpcName
+    .split(/[./]/)
+    .reduce<string[]>((acc, curr) => {
+      if (curr) {
+        acc.push(acc.length === 0 ? camelCase(curr) : pascalCase(curr));
+      }
+
+      return acc;
+    }, [])
+    .join('');
+}
 
 export const defaultMinorWords = [
   'and',
@@ -106,7 +128,9 @@ const i18nTranslationWriter: I18nPluginTranslationWriter = (
     .otherwise(() => undefined);
 
 describe(I18nPlugin, () => {
-  it('should write translations according to specified parameters', () => {
+  const source = parseApiSource(mockApiSource as unknown as APISource);
+
+  it('should write translations according to specified parameters', async () => {
     const p = new I18nPlugin({
       indexFile: {
         directory: './generated',
@@ -153,10 +177,37 @@ describe(I18nPlugin, () => {
       },
     });
 
-    new Generator({
-      ...defaultConfig,
-      dryRun: true,
-      plugins: [p],
-    }).generate(parseApiSource(mockApiSource as unknown as APISource));
+    const gen = await new Builder(
+      process.cwd(),
+      {
+        ...defaultConfig,
+        dryRun: { log: false },
+        typeOutput: {
+          directory: './types/generated',
+          fileName: 'api.ts',
+        },
+        clientOutput: {
+          directory: './api-client/generated/client-functions',
+          fileName: 'index.ts',
+        },
+        types: {
+          enumType: 'enum',
+          nameWriter: typeNameWriter,
+        },
+        client: {
+          methodNameWriter,
+        },
+        plugins: [p as any],
+      },
+      source,
+    ).build();
+
+    expect(gen).toBeDefined();
+
+    const files = [...p.files].sort((a, b) => a.config.fileName.localeCompare(b.config.fileName));
+
+    for (const file of files) {
+      expect((file as any)._builtFile.writtenContent).toMatchSnapshot();
+    }
   });
 });
