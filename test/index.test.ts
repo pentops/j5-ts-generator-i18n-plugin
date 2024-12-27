@@ -1,7 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { match, P } from 'ts-pattern';
 import { camelCase, capitalCase, kebabCase, pascalCase } from 'change-case';
-import { parseApiSource, GeneratedSchema, PackageSummary, APISource, defaultConfig, ParsedMethod, Builder } from '@pentops/jsonapi-jdef-ts-generator';
+import {
+  parseApiSource,
+  GeneratedSchema,
+  PackageSummary,
+  APISource,
+  defaultConfig,
+  ParsedMethod,
+  Builder,
+  mergeConfig,
+} from '@pentops/jsonapi-jdef-ts-generator';
 import { I18nPlugin, I18nPluginFileGeneratorConfig } from '../src/plugin';
 import { I18nPluginTranslationWriter, Translation } from '../src';
 import mockApiSource from './helpers/mock-api.json';
@@ -179,8 +188,7 @@ describe(I18nPlugin, () => {
 
     const gen = await new Builder(
       process.cwd(),
-      {
-        ...defaultConfig,
+      mergeConfig({
         dryRun: { log: false },
         typeOutput: {
           directory: './types/generated',
@@ -198,7 +206,7 @@ describe(I18nPlugin, () => {
           methodNameWriter,
         },
         plugins: [p as any],
-      },
+      }),
       source,
     ).build();
 
