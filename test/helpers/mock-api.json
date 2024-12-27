@@ -1654,6 +1654,19 @@
                   },
                   "name": "external",
                   "protoField": [3]
+                },
+                {
+                  "name": "numericEnumValue",
+                  "schema": {
+                    "!type": "enum",
+                    "enum": {
+                      "ref": {
+                        "package": "j5.list.v1",
+                        "schema": "TestNumeric"
+                      }
+                    }
+                  },
+                  "protoField": [3]
                 }
               ]
             }

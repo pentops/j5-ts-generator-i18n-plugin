@@ -13,7 +13,7 @@ import {
   type IWritableFile,
 } from '@pentops/jsonapi-jdef-ts-generator';
 import { camelCase } from 'change-case';
-import set from 'lodash.set';
+import setWith from 'lodash.setwith';
 import { sortByKey } from '@pentops/sort-helpers';
 import {
   buildProspectiveTranslations,
@@ -144,7 +144,7 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
       const translationsSortedByKeyName = sortByKey(Array.from(finalTranslationsForFile.values()), (entry) => entry.key);
 
       for (const translation of translationsSortedByKeyName) {
-        set(fileContent, translation.key, translation.value);
+        setWith(fileContent, translation.key, translation.value, Object);
         this.writtenTranslations[translation.key] = translation;
       }
 

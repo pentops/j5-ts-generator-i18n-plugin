@@ -43,6 +43,7 @@ exports[`I18nPlugin > should write translations according to specified parameter
     "J5AuthV1AuthenticationMethod": {
       "external": "External",
       "jwt": "JWT",
+      "numericEnumValue": "Numeric Enum Value",
       "session": "Session"
     }
   }
