@@ -1,6 +1,6 @@
 {
   "name": "@pentops/j5-ts-generator-i18n-plugin",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "",
   "main": "dist/index.js",
   "type": "module",
