@@ -23,7 +23,7 @@ import enDanteNs from '../../translation/translations/en/dante.json';
 import enJ5Ns from '../../translation/translations/en/j5.json';
 import enO5Ns from '../../translation/translations/en/o5.json';
 
-i18n.use(initReactI18next).init({
+export const i18nOpts = {
     resources: {
         en: {
             dante: enDanteNs,
@@ -31,7 +31,11 @@ i18n.use(initReactI18next).init({
             j5: enJ5Ns
         }
     }
-})
+} as const;
+
+export type I18nNamespaces = keyof (typeof I18nNamespaces)['resources']['en'];
+
+i18n.use(initReactI18next).init(i18nOpts)
 
 export { i18n };
 "

@@ -23,6 +23,8 @@ import {
   defaultSchemaTranslationWriter,
   defaultTranslationPathOrGetter,
   gatherTranslations,
+  I18N_INIT_OPTS_VAR_NAME,
+  I18N_NAMESPACES_TYPE_NAME,
   I18NEXT_DEFAULT_EXPORT_NAME,
   I18NEXT_IMPORT_PATH,
   I18NEXT_INIT_FUNCTION_NAME,
@@ -223,16 +225,59 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
       );
     }
 
+    const builtLanguages = Array.from(new Set(Object.keys(resourcesByLanguageAndNamespace)));
+
+    const resourcesAccess = factory.createIndexedAccessTypeNode(
+      factory.createTypeQueryNode(factory.createIdentifier(I18N_NAMESPACES_TYPE_NAME)),
+      factory.createLiteralTypeNode(factory.createStringLiteral('resources', true)),
+    );
+
+    indexFile.addNodes(
+      factory.createVariableStatement(
+        [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        factory.createVariableDeclarationList(
+          [
+            factory.createVariableDeclaration(
+              I18N_INIT_OPTS_VAR_NAME,
+              undefined,
+              undefined,
+              factory.createAsExpression(
+                createObjectLiteral({ ...remainingInitOptions, resources: resourcesObjectLiteral }),
+                factory.createTypeReferenceNode('const'),
+              ),
+            ),
+          ],
+          ts.NodeFlags.Const,
+        ),
+      ),
+      factory.createIdentifier('\n'),
+      factory.createTypeAliasDeclaration(
+        [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        I18N_NAMESPACES_TYPE_NAME,
+        undefined,
+        factory.createUnionTypeNode(
+          builtLanguages.map((lang) =>
+            ts.factory.createTypeOperatorNode(
+              ts.SyntaxKind.KeyOfKeyword,
+              factory.createIndexedAccessTypeNode(resourcesAccess, factory.createLiteralTypeNode(factory.createStringLiteral(lang, true))),
+            ),
+          ),
+        ),
+      ),
+      factory.createIdentifier('\n'),
+    );
+
     callExpression = factory.createCallExpression(
       factory.createPropertyAccessExpression(
         callExpression || factory.createIdentifier(I18NEXT_DEFAULT_EXPORT_NAME),
         factory.createIdentifier(I18NEXT_INIT_FUNCTION_NAME),
       ),
       undefined,
-      [createObjectLiteral({ ...remainingInitOptions, resources: resourcesObjectLiteral })],
+      [factory.createIdentifier(I18N_INIT_OPTS_VAR_NAME)],
     );
 
     indexFile.addNodes(callExpression, factory.createIdentifier('\n'));
+
     indexFile.addManualExport(undefined, { namedExports: [I18NEXT_DEFAULT_EXPORT_NAME], typeOnlyExports: [] });
     indexFile.generateHeading();
   }

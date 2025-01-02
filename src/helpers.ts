@@ -10,6 +10,9 @@ export const I18NEXT_DEFAULT_EXPORT_NAME = 'i18n';
 export const I18NEXT_INIT_FUNCTION_NAME = 'init';
 export const I18NEXT_USE_FUNCTION_NAME = 'use';
 
+export const I18N_INIT_OPTS_VAR_NAME = 'i18nOpts';
+export const I18N_NAMESPACES_TYPE_NAME = 'I18nNamespaces';
+
 export interface Translation {
   // JSON dot notation
   key: string;
