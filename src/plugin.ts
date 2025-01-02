@@ -228,7 +228,7 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
     const builtLanguages = Array.from(new Set(Object.keys(resourcesByLanguageAndNamespace)));
 
     const resourcesAccess = factory.createIndexedAccessTypeNode(
-      factory.createTypeQueryNode(factory.createIdentifier(I18N_NAMESPACES_TYPE_NAME)),
+      factory.createTypeQueryNode(factory.createIdentifier(I18N_INIT_OPTS_VAR_NAME)),
       factory.createLiteralTypeNode(factory.createStringLiteral('resources', true)),
     );
 

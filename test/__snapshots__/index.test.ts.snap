@@ -33,7 +33,7 @@ export const i18nOpts = {
     }
 } as const;
 
-export type I18nNamespaces = keyof (typeof I18nNamespaces)['resources']['en'];
+export type I18nNamespaces = keyof (typeof i18nOpts)['resources']['en'];
 
 i18n.use(initReactI18next).init(i18nOpts)
 
