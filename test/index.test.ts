@@ -1,7 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { match, P } from 'ts-pattern';
 import { camelCase, capitalCase, kebabCase, pascalCase } from 'change-case';
-import { parseApiSource, GeneratedSchema, PackageSummary, APISource, ParsedMethod, Builder, mergeConfig } from '@pentops/jsonapi-jdef-ts-generator';
+import {
+  parseApiSource,
+  GeneratedSchema,
+  PackageSummary,
+  APISource,
+  ParsedMethod,
+  Builder,
+  mergeConfig,
+  defaultEnumKeyNameWriter,
+} from '@pentops/jsonapi-jdef-ts-generator';
 import { I18nPlugin, I18nPluginFileGeneratorConfig, I18nPluginTranslationWriter, Translation } from '../src';
 import mockApiSource from './helpers/mock-api.json';
 
@@ -124,6 +133,20 @@ const i18nTranslationWriter: I18nPluginTranslationWriter = (
         };
       }),
     )
+    .with({ rawSchema: { any: P.not(P.nullish) } }, (s) =>
+      s.rawSchema.any.onlyDefinedTypes?.map((value) => {
+        const path = value;
+
+        if (existingValues?.has(path)) {
+          return existingValues.get(path)!;
+        }
+
+        return {
+          key: path,
+          value: titleCaseName(value, caseOverrides),
+        };
+      }),
+    )
     .otherwise(() => undefined);
 
 describe(I18nPlugin, () => {
@@ -137,14 +160,23 @@ describe(I18nPlugin, () => {
         middleware: [{ importSpecifier: 'initReactI18next', importPath: 'react-i18next' }],
         addGeneratedResources: true,
       },
+      defaultNamespaceFile: {
+        languages: ['en'],
+        directory: '../translation/translations',
+        fileName: 'common.json',
+      },
       files: (generatedSchemas) => {
-        const directory = '../translation/translations/en';
+        const directory = '../translation/translations';
         const files: Map<string, I18nPluginFileGeneratorConfig> = new Map();
 
         function getValidSchemaPackage(schema: GeneratedSchema) {
           return match(schema)
             .with(
-              P.union({ rawSchema: { enum: { derivedHelperType: undefined } } }, { rawSchema: { oneOf: P.not(P.nullish) } }),
+              P.union(
+                { rawSchema: { enum: { derivedHelperType: undefined } } },
+                { rawSchema: { oneOf: P.not(P.nullish) } },
+                { rawSchema: { any: { onlyDefinedTypes: P.not(P.nullish) } } },
+              ),
               (s) => s.parentPackage,
             )
             .otherwise(() => undefined);
@@ -190,6 +222,7 @@ describe(I18nPlugin, () => {
         },
         types: {
           enumType: 'enum',
+          enumKeyNameWriter: defaultEnumKeyNameWriter,
           nameWriter: typeNameWriter,
         },
         client: {

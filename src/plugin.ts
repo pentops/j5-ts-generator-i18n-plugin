@@ -19,6 +19,8 @@ import {
   buildProspectiveTranslations,
   buildResourcesObjectLiteral,
   defaultConflictHandler,
+  defaultDefinedAnySchemaTranslationPathGetter,
+  defaultI18nPluginDefinedAnySchemaTranslationWriter,
   defaultNamespaceWriter,
   defaultSchemaTranslationWriter,
   defaultTranslationPathOrGetter,
@@ -30,6 +32,8 @@ import {
   I18NEXT_INIT_FUNCTION_NAME,
   I18NEXT_USE_FUNCTION_NAME,
   type I18nPluginConflictHandler,
+  I18nPluginDefinedAnySchemaTranslationPathGetter,
+  I18nPluginDefinedAnySchemaTranslationWriter,
   type I18nPluginTranslationPathGetter,
   type I18nPluginTranslationWriter,
   type NamespaceWriter,
@@ -65,8 +69,17 @@ export interface I18nIndexFileConfig<TFileContentType = string> extends IPluginF
   topOfFileComment?: string;
 }
 
+export interface I18nPluginDefaultNamespaceFileConfig
+  extends Omit<I18nPluginFileGeneratorConfig, 'translationPathOrGetter' | 'translationWriter' | 'language'> {
+  languages: string[];
+  translationPathOrGetter?: I18nPluginDefinedAnySchemaTranslationPathGetter;
+  translationWriter?: I18nPluginDefinedAnySchemaTranslationWriter;
+}
+
 export interface I18nPluginConfig extends IPluginConfig<I18nPluginFile> {
   conflictHandler: I18nPluginConflictHandler;
+  // defaultNamespaceFile is where schema names for defined anys will go
+  defaultNamespaceFile: I18nPluginDefaultNamespaceFileConfig;
   files: I18nPluginFileGeneratorConfig[] | I18nPluginFileConfigCreator;
   indexFile?: I18nIndexFileConfig;
   namespaceWriter: NamespaceWriter;
@@ -91,7 +104,38 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
   }
 
   protected createPluginFilesFromConfig(fileConfig?: I18nPluginFileGeneratorConfig[]) {
-    super.createPluginFilesFromConfig((fileConfig || []).map((config) => ({ ...config, exportFromIndexFile: false })));
+    super.createPluginFilesFromConfig(
+      (fileConfig || []).map((config) => ({ ...config, exportFromIndexFile: false, directory: `${config.directory}/${config.language}` })),
+    );
+  }
+
+  private mergeAndBuildTranslations(newTranslations: Map<string, Translation>, existingTranslationsInFile: Map<string, Translation>) {
+    const prospects = buildProspectiveTranslations(newTranslations, existingTranslationsInFile);
+
+    const finalTranslationsForFile = new Map<string, Translation>();
+
+    for (const [key, value] of prospects) {
+      if (value.newValue !== undefined && value.existingValue !== undefined && value.newValue === value.existingValue) {
+        finalTranslationsForFile.set(key, { key, value: value.newValue, source: value.source });
+      } else if (value.newValue !== undefined || value.existingValue !== undefined) {
+        const finalValue = this.pluginConfig.conflictHandler(value, prospects);
+
+        if (finalValue) {
+          finalTranslationsForFile.set(finalValue.key, finalValue);
+        }
+      }
+    }
+
+    const fileContent: ResourceLanguage = {};
+
+    const translationsSortedByKeyName = sortByKey(Array.from(finalTranslationsForFile.values()), (entry) => entry.key);
+
+    for (const translation of translationsSortedByKeyName) {
+      setWith(fileContent, translation.key, translation.value, Object);
+      this.writtenTranslations[translation.key] = translation;
+    }
+
+    return JSON.stringify(fileContent, null, 2);
   }
 
   public async run(): Promise<IPluginRunOutput<I18nPluginFile>> {
@@ -125,32 +169,11 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
         }
       }
 
-      const prospects = buildProspectiveTranslations(newTranslations, existingTranslationsInFile);
+      file.setRawContent(this.mergeAndBuildTranslations(newTranslations, existingTranslationsInFile));
+    }
 
-      const finalTranslationsForFile = new Map<string, Translation>();
-
-      for (const [key, value] of prospects) {
-        if (value.newValue !== undefined && value.existingValue !== undefined && value.newValue === value.existingValue) {
-          finalTranslationsForFile.set(key, { key, value: value.newValue, source: value.source });
-        } else if (value.newValue !== undefined || value.existingValue !== undefined) {
-          const finalValue = this.pluginConfig.conflictHandler(value, prospects);
-
-          if (finalValue) {
-            finalTranslationsForFile.set(finalValue.key, finalValue);
-          }
-        }
-      }
-
-      const fileContent: ResourceLanguage = {};
-
-      const translationsSortedByKeyName = sortByKey(Array.from(finalTranslationsForFile.values()), (entry) => entry.key);
-
-      for (const translation of translationsSortedByKeyName) {
-        setWith(fileContent, translation.key, translation.value, Object);
-        this.writtenTranslations[translation.key] = translation;
-      }
-
-      file.setRawContent(JSON.stringify(fileContent, null, 2));
+    if (this.pluginConfig.defaultNamespaceFile) {
+      await this.generateDefaultNamespaceFiles();
     }
 
     if (this.pluginConfig.indexFile) {
@@ -162,6 +185,54 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
     return {
       files: out.reduce<IWritableFile[]>((acc, curr) => (curr ? [...acc, curr] : acc), []),
     };
+  }
+
+  private async generateDefaultNamespaceFile(language: string) {
+    const defaultNamespaceFile = this.createPluginFile(
+      {
+        ...this.pluginConfig.defaultNamespaceFile,
+        directory: `${this.pluginConfig.defaultNamespaceFile.directory}/${language}`,
+        language,
+        exportFromIndexFile: false,
+      },
+      defaultGeneratorFileReader,
+    );
+
+    let fileData: ResourceLanguage | undefined;
+
+    try {
+      fileData = parseExistingValue((await defaultNamespaceFile.pollForExistingFileContent())?.content);
+    } catch {}
+
+    const existingTranslationsInFile = gatherTranslations(fileData);
+    const newTranslations: Map<string, Translation> = new Map();
+
+    for (const schemaName of this.definedAnySchemas) {
+      const translationPath = (this.pluginConfig.defaultNamespaceFile.translationPathOrGetter || defaultDefinedAnySchemaTranslationPathGetter)(
+        language,
+        schemaName,
+      );
+
+      if (translationPath) {
+        const translation = (this.pluginConfig.defaultNamespaceFile.translationWriter || defaultI18nPluginDefinedAnySchemaTranslationWriter)(
+          language,
+          schemaName,
+          this.generatedSchemas.get(schemaName),
+          translationPath,
+        );
+
+        if (translation) {
+          newTranslations.set(translation.key, translation);
+        }
+      }
+    }
+
+    defaultNamespaceFile.setRawContent(this.mergeAndBuildTranslations(newTranslations, existingTranslationsInFile));
+    this.files.push(defaultNamespaceFile);
+  }
+
+  private async generateDefaultNamespaceFiles() {
+    await Promise.all(this.pluginConfig.defaultNamespaceFile.languages.map((language) => this.generateDefaultNamespaceFile(language)));
   }
 
   private generateIndexFile() {
@@ -242,7 +313,11 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
               undefined,
               undefined,
               factory.createAsExpression(
-                createObjectLiteral({ ...remainingInitOptions, resources: resourcesObjectLiteral }),
+                createObjectLiteral({
+                  ...remainingInitOptions,
+                  resources: resourcesObjectLiteral,
+                  defaultNS: this.pluginConfig.defaultNamespaceFile.namespaceName,
+                }),
                 factory.createTypeReferenceNode('const'),
               ),
             ),

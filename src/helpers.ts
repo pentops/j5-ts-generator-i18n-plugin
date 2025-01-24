@@ -1,7 +1,7 @@
 import { factory } from 'typescript';
 import { createObjectLiteral, type GeneratedSchema } from '@pentops/jsonapi-jdef-ts-generator';
 import { match, P } from 'ts-pattern';
-import { camelCase } from 'change-case';
+import { camelCase, sentenceCase } from 'change-case';
 import type { Resource, ResourceLanguage } from 'i18next';
 import { I18nPluginFile } from './plugin-file';
 
@@ -79,6 +79,39 @@ export const defaultTranslationPathOrGetter: I18nPluginTranslationPathGetter = (
     .with({ rawSchema: { enum: P.not(P.nullish) } }, () => `enum.${schema.generatedName}`)
     .otherwise(() => undefined);
 
+export type I18nPluginDefinedAnySchemaTranslationPathGetter = (language: string, fullGrpcName: string) => string | undefined;
+
+export const defaultDefinedAnySchemaTranslationPathGetter: I18nPluginDefinedAnySchemaTranslationPathGetter = (
+  language: string,
+  fullGrpcName: string,
+): string | undefined => `schema.${fullGrpcName}`;
+
+export type I18nPluginDefinedAnySchemaTranslationWriter = (
+  language: string,
+  fullGrpcName: string,
+  schema: GeneratedSchema | undefined,
+  translationPath: string,
+) => Translation | undefined;
+
+export const defaultI18nPluginDefinedAnySchemaTranslationWriter: I18nPluginDefinedAnySchemaTranslationWriter = (
+  language: string,
+  fullGrpcName,
+  schema,
+  translationPath,
+) => {
+  if (schema?.generatedName) {
+    return {
+      key: translationPath,
+      value: schema.generatedName,
+    };
+  }
+
+  return {
+    key: translationPath,
+    value: sentenceCase(fullGrpcName),
+  };
+};
+
 /**
  * The `Translation` value returned will be used to replace the existing value.
  * Return null to exclude the translation altogether. If newValue is undefined, a translation that wasn't translated
@@ -90,14 +123,14 @@ export type I18nPluginConflictHandler = (
 ) => Translation | null;
 
 export const defaultConflictHandler: I18nPluginConflictHandler = (prospect) => {
-  return match({ n: prospect.newValue, e: prospect.existingValue })
+  return match({ newValue: prospect.newValue, existingValue: prospect.existingValue })
     .returnType<Translation | null>()
-    .with({ n: P.not(P.nullish), e: P.nullish }, ({ n }) => ({
+    .with({ newValue: P.not(P.nullish), existingValue: P.nullish }, ({ newValue }) => ({
       key: prospect.key,
-      value: n,
+      value: newValue,
     }))
-    .with({ n: P.not(P.nullish), e: P.not(P.nullish) }, ({ e }) => ({ key: prospect.key, value: e }))
-    .with({ n: P.nullish, e: P.not(P.nullish) }, ({ e }) => ({ key: prospect.key, value: e }))
+    .with({ newValue: P.not(P.nullish), existingValue: P.not(P.nullish) }, ({ existingValue }) => ({ key: prospect.key, value: existingValue }))
+    .with({ newValue: P.nullish, existingValue: P.not(P.nullish) }, ({ existingValue }) => ({ key: prospect.key, value: existingValue }))
     .otherwise(() => null);
 };
 
