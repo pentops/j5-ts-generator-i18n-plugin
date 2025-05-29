@@ -32,7 +32,7 @@
     "vitest": "^3.1.4"
   },
   "dependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.123",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.124",
     "@pentops/sort-helpers": "^0.0.1",
     "change-case": "^5.4.4",
     "lodash.setwith": "^4.3.2",

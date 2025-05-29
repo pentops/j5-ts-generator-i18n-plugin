@@ -78,8 +78,8 @@ export interface I18nPluginDefaultNamespaceFileConfig
 
 export interface I18nPluginConfig extends IPluginConfig<I18nPluginFile> {
   conflictHandler: I18nPluginConflictHandler;
-  // defaultNamespaceFile is where schema names for defined anys will go
-  defaultNamespaceFile: I18nPluginDefaultNamespaceFileConfig;
+  // defaultNamespaceFile is where schema names for defined any values will go
+  defaultNamespaceFile?: I18nPluginDefaultNamespaceFileConfig;
   files: I18nPluginFileGeneratorConfig[] | I18nPluginFileConfigCreator;
   indexFile?: I18nIndexFileConfig;
   namespaceWriter: NamespaceWriter;
@@ -188,6 +188,10 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
   }
 
   private async generateDefaultNamespaceFile(language: string) {
+    if (!this.pluginConfig.defaultNamespaceFile) {
+      return;
+    }
+
     const defaultNamespaceFile = this.createPluginFile(
       {
         ...this.pluginConfig.defaultNamespaceFile,
@@ -232,6 +236,10 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
   }
 
   private async generateDefaultNamespaceFiles() {
+    if (!this.pluginConfig.defaultNamespaceFile || !this.pluginConfig.defaultNamespaceFile.languages.length) {
+      return;
+    }
+
     await Promise.all(this.pluginConfig.defaultNamespaceFile.languages.map((language) => this.generateDefaultNamespaceFile(language)));
   }
 
@@ -303,29 +311,34 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
       factory.createLiteralTypeNode(factory.createStringLiteral('resources', true)),
     );
 
-    indexFile.addNodes(
-      factory.createVariableStatement(
-        [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        factory.createVariableDeclarationList(
-          [
-            factory.createVariableDeclaration(
-              I18N_INIT_OPTS_VAR_NAME,
-              undefined,
-              undefined,
-              factory.createAsExpression(
-                createObjectLiteral({
-                  ...remainingInitOptions,
-                  resources: resourcesObjectLiteral,
-                  defaultNS: this.pluginConfig.defaultNamespaceFile.namespaceName,
-                }),
-                factory.createTypeReferenceNode('const'),
+    if (this.pluginConfig.defaultNamespaceFile) {
+      indexFile.addNodes(
+        factory.createVariableStatement(
+          [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+          factory.createVariableDeclarationList(
+            [
+              factory.createVariableDeclaration(
+                I18N_INIT_OPTS_VAR_NAME,
+                undefined,
+                undefined,
+                factory.createAsExpression(
+                  createObjectLiteral({
+                    ...remainingInitOptions,
+                    resources: resourcesObjectLiteral,
+                    defaultNS: this.pluginConfig.defaultNamespaceFile.namespaceName,
+                  }),
+                  factory.createTypeReferenceNode('const'),
+                ),
               ),
-            ),
-          ],
-          ts.NodeFlags.Const,
+            ],
+            ts.NodeFlags.Const,
+          ),
         ),
-      ),
-      factory.createIdentifier('\n'),
+        factory.createIdentifier('\n'),
+      );
+    }
+
+    indexFile.addNodes(
       factory.createTypeAliasDeclaration(
         [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         I18N_NAMESPACES_TYPE_NAME,
