@@ -63,6 +63,12 @@ export const defaultSchemaTranslationWriter: I18nPluginTranslationWriter = (sche
         value: property.name,
       })),
     )
+    .with({ rawSchema: { polymorph: { members: P.not(P.nullish) } } }, (s) =>
+      Array.from(s.rawSchema.polymorph.members.values()).map((member) => ({
+        key: `${schemaPath}.${member}`,
+        value: member,
+      })),
+    )
     .with({ rawSchema: { enum: P.not(P.nullish) } }, (s) =>
       s.rawSchema.enum.options.map((value) => ({
         key: `${schemaPath}.${value.name}`,
@@ -77,6 +83,7 @@ export const defaultTranslationPathOrGetter: I18nPluginTranslationPathGetter = (
   match(schema)
     .with({ rawSchema: { oneOf: P.not(P.nullish) } }, () => `oneOf.${schema.generatedName}`)
     .with({ rawSchema: { enum: P.not(P.nullish) } }, () => `enum.${schema.generatedName}`)
+    .with({ rawSchema: { polymorph: P.not(P.nullish) } }, () => `polymorph.${schema.generatedName}`)
     .otherwise(() => undefined);
 
 export type I18nPluginDefinedAnySchemaTranslationPathGetter = (language: string, fullGrpcName: string) => string | undefined;
