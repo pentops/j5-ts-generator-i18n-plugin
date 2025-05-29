@@ -22,7 +22,7 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/lodash.setwith": "^4.3.9",
-    "@types/node": "^22.15.24",
+    "@types/node": "^22.15.26",
     "i18next": "^25.2.1",
     "prettier": "^3.5.3",
     "rollup": "^4.41.1",
@@ -32,7 +32,7 @@
     "vitest": "^3.1.4"
   },
   "dependencies": {
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.126",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.127",
     "@pentops/sort-helpers": "^0.0.1",
     "change-case": "^5.4.4",
     "lodash.setwith": "^4.3.2",
