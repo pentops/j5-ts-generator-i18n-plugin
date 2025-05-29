@@ -1,7 +1,7 @@
 import { factory } from 'typescript';
 import { createObjectLiteral, type GeneratedSchema } from '@pentops/jsonapi-jdef-ts-generator';
 import { match, P } from 'ts-pattern';
-import { camelCase, sentenceCase } from 'change-case';
+import { camelCase } from 'change-case';
 import type { Resource, ResourceLanguage } from 'i18next';
 import { I18nPluginFile } from './plugin-file';
 
@@ -85,39 +85,6 @@ export const defaultTranslationPathOrGetter: I18nPluginTranslationPathGetter = (
     .with({ rawSchema: { enum: P.not(P.nullish) } }, () => `enum.${schema.generatedName}`)
     .with({ rawSchema: { polymorph: P.not(P.nullish) } }, () => `polymorph.${schema.generatedName}`)
     .otherwise(() => undefined);
-
-export type I18nPluginDefinedAnySchemaTranslationPathGetter = (language: string, fullGrpcName: string) => string | undefined;
-
-export const defaultDefinedAnySchemaTranslationPathGetter: I18nPluginDefinedAnySchemaTranslationPathGetter = (
-  language: string,
-  fullGrpcName: string,
-): string | undefined => `schema.${fullGrpcName}`;
-
-export type I18nPluginDefinedAnySchemaTranslationWriter = (
-  language: string,
-  fullGrpcName: string,
-  schema: GeneratedSchema | undefined,
-  translationPath: string,
-) => Translation | undefined;
-
-export const defaultI18nPluginDefinedAnySchemaTranslationWriter: I18nPluginDefinedAnySchemaTranslationWriter = (
-  language: string,
-  fullGrpcName,
-  schema,
-  translationPath,
-) => {
-  if (schema?.generatedName) {
-    return {
-      key: translationPath,
-      value: schema.generatedName,
-    };
-  }
-
-  return {
-    key: translationPath,
-    value: sentenceCase(fullGrpcName),
-  };
-};
 
 /**
  * The `Translation` value returned will be used to replace the existing value.

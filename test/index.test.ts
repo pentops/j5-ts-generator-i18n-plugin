@@ -133,8 +133,8 @@ const i18nTranslationWriter: I18nPluginTranslationWriter = (
         };
       }),
     )
-    .with({ rawSchema: { any: P.not(P.nullish) } }, (s) =>
-      s.rawSchema.any.onlyDefinedTypes?.map((value) => {
+    .with({ rawSchema: { polymorph: P.not(P.nullish) } }, (s) =>
+      s.rawSchema.polymorph.members?.map((value) => {
         const path = value;
 
         if (existingValues?.has(path)) {
@@ -175,7 +175,7 @@ describe(I18nPlugin, () => {
               P.union(
                 { rawSchema: { enum: { derivedHelperType: undefined } } },
                 { rawSchema: { oneOf: P.not(P.nullish) } },
-                { rawSchema: { any: { onlyDefinedTypes: P.not(P.nullish) } } },
+                { rawSchema: { polymorph: { members: P.not(P.nullish) } } },
               ),
               (s) => s.parentPackage,
             )

@@ -18,6 +18,13 @@ export interface WrittenTranslation {
           generatedName: string;
           values: string[];
         };
+      }
+    | {
+        polymorph: {
+          fullGrpcName: string;
+          generatedName: string;
+          members?: string[];
+        };
       };
 }
 

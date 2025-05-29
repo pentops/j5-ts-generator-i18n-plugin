@@ -19,8 +19,6 @@ import {
   buildProspectiveTranslations,
   buildResourcesObjectLiteral,
   defaultConflictHandler,
-  defaultDefinedAnySchemaTranslationPathGetter,
-  defaultI18nPluginDefinedAnySchemaTranslationWriter,
   defaultNamespaceWriter,
   defaultSchemaTranslationWriter,
   defaultTranslationPathOrGetter,
@@ -32,8 +30,6 @@ import {
   I18NEXT_INIT_FUNCTION_NAME,
   I18NEXT_USE_FUNCTION_NAME,
   type I18nPluginConflictHandler,
-  I18nPluginDefinedAnySchemaTranslationPathGetter,
-  I18nPluginDefinedAnySchemaTranslationWriter,
   type I18nPluginTranslationPathGetter,
   type I18nPluginTranslationWriter,
   type NamespaceWriter,
@@ -72,8 +68,6 @@ export interface I18nIndexFileConfig<TFileContentType = string> extends IPluginF
 export interface I18nPluginDefaultNamespaceFileConfig
   extends Omit<I18nPluginFileGeneratorConfig, 'translationPathOrGetter' | 'translationWriter' | 'language'> {
   languages: string[];
-  translationPathOrGetter?: I18nPluginDefinedAnySchemaTranslationPathGetter;
-  translationWriter?: I18nPluginDefinedAnySchemaTranslationWriter;
 }
 
 export interface I18nPluginConfig extends IPluginConfig<I18nPluginFile> {
@@ -210,26 +204,6 @@ export class I18nPlugin extends BasePlugin<string, I18nPluginFileGeneratorConfig
 
     const existingTranslationsInFile = gatherTranslations(fileData);
     const newTranslations: Map<string, Translation> = new Map();
-
-    for (const schemaName of this.definedAnySchemas) {
-      const translationPath = (this.pluginConfig.defaultNamespaceFile.translationPathOrGetter || defaultDefinedAnySchemaTranslationPathGetter)(
-        language,
-        schemaName,
-      );
-
-      if (translationPath) {
-        const translation = (this.pluginConfig.defaultNamespaceFile.translationWriter || defaultI18nPluginDefinedAnySchemaTranslationWriter)(
-          language,
-          schemaName,
-          this.generatedSchemas.get(schemaName),
-          translationPath,
-        );
-
-        if (translation) {
-          newTranslations.set(translation.key, translation);
-        }
-      }
-    }
 
     defaultNamespaceFile.setRawContent(this.mergeAndBuildTranslations(newTranslations, existingTranslationsInFile));
     this.files.push(defaultNamespaceFile);
